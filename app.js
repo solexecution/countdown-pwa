@@ -302,14 +302,17 @@ function renderHub() {
       });
 
       // Delete
-      card.querySelector('.dl-card-del').addEventListener('click', () => {
-        if (confirm(`Delete deadline "${dl.name}"?`)) {
-          state.deadlines = state.deadlines.filter(old => old.id !== dl.id);
-          if (state.activeId === dl.id) state.activeId = null;
-          saveState();
-          renderHub();
-        }
-      });
+      const delBtn = card.querySelector('.dl-card-del');
+      if (delBtn) {
+        delBtn.addEventListener('click', () => {
+          if (confirm(`Delete deadline "${dl.name}"?`)) {
+            state.deadlines = state.deadlines.filter(old => old.id !== dl.id);
+            if (state.activeId === dl.id) state.activeId = null;
+            saveState();
+            renderHub();
+          }
+        });
+      }
 
       hubGrid.appendChild(card);
     });
