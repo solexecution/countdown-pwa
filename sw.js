@@ -1,4 +1,4 @@
-const CACHE_NAME = 'countdown-v5';
+const CACHE_NAME = 'countdown-v6';
 const ASSETS = [
   './',
   './index.html',

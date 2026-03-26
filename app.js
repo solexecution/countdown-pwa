@@ -290,7 +290,7 @@ function renderHub() {
         <div class="dl-card-next ${!nextMs || past ? 'empty' : ''}">
           ${nextMs ? `${esc(nextMs.name)} ${relativeDelta(new Date(nextMs.date), now)}` : ''}
         </div>
-        <button class="dl-card-del" data-id="${dl.id}" title="Delete deadline">✕</button>
+        ${dl.id === 'risko_day' ? '' : `<button class="dl-card-del" data-id="${dl.id}" title="Delete deadline">✕</button>`}
       `;
 
       // Navigate to countdown
@@ -792,8 +792,26 @@ function loadState() {
   } catch { /* ignore */ }
 }
 
+function ensureRiskoDay() {
+  const exists = state.deadlines.some(d => d.id === 'risko_day');
+  if (!exists) {
+    state.deadlines.unshift({
+      id: 'risko_day',
+      name: 'Risko Day',
+      deadline: '2026-04-03T06:00:00',
+      dayStart: '07:00',
+      dayEnd: '22:00',
+      createdAt: new Date().toISOString(),
+      color: '#ff5f84',
+      milestones: []
+    });
+    saveState();
+  }
+}
+
 // ─── INIT ───────────────────────────────────────────────────────────────
 loadState();
+ensureRiskoDay();
 
 if (state.activeId) {
   const dl = getActive();
