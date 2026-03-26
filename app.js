@@ -640,7 +640,7 @@ btnOpenCreateModal.addEventListener('click', () => openDeadlineModal(null));
 btnCloseDeadlineModal.addEventListener('click', closeDeadlineModal);
 deadlineModal.addEventListener('click', e => { if (e.target === deadlineModal) closeDeadlineModal(); });
 
-btnAddMilestone.addEventListener('click', openMilestoneModal);
+btnAddMilestone.addEventListener('click', () => openMilestoneModal(null));
 btnModalClose.addEventListener('click', closeMilestoneModal);
 milestoneModal.addEventListener('click', e => { if (e.target === milestoneModal) closeMilestoneModal(); });
 
