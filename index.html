@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>CountDown</title>
+  <meta name="description" content="Beautiful countdown timer tracking days, daytime hours, and nighttime hours until your deadline." />
+  <meta name="theme-color" content="#090b1a" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon.svg" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Animated background particles -->
+  <div class="bg-layer" id="bgLayer"></div>
+
+  <main class="app">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon"></span>
+        <span class="logo-text">CountDown</span>
+      </div>
+    </header>
+
+    <!-- ── Hub / Dashboard ────────────────────────────────────────── -->
+    <section class="hub-panel" id="hubPanel">
+      <div class="hub-header">
+        <h1 class="hub-title">Your Deadlines</h1>
+        <button class="btn-create" id="btnOpenCreateModal">+ New</button>
+      </div>
+
+      <div class="hub-grid" id="hubGrid">
+        <!-- Cards rendered by JS -->
+      </div>
+      <div class="hub-empty" id="hubEmpty">
+        <div class="empty-icon"></div>
+        <p>You have no active deadlines.</p>
+        <p>Create one to start tracking!</p>
+      </div>
+    </section>
+
+    <!-- ── Countdown display (Single Deadline View) ──────────────── -->
+    <section class="countdown-panel hidden" id="countdownPanel">
+      
+      <div class="countdown-nav">
+        <button class="btn-back" id="btnBack">← Back to Hub</button>
+        <button class="btn-edit" id="btnEditDeadline">Edit</button>
+      </div>
+
+      <h1 class="deadline-hero-title" id="deadlineLabel">Headline Placeholder</h1>
+
+      <div class="time-phase" id="phaseIndicator">
+        <span class="phase-dot" id="phaseDot"></span>
+        <span id="phaseText">–</span>
+      </div>
+
+      <!-- Main tiles -->
+      <div class="tiles">
+        <div class="tile tile--days">
+          <div class="tile-glow" id="daysGlow"></div>
+          <div class="tile-value" id="daysVal" style="color:var(--active-color)">0</div>
+          <div class="tile-label">Days</div>
+        </div>
+
+        <div class="tile tile--day-hours">
+          <div class="tile-glow"></div>
+          <div class="tile-value" id="dayHoursVal">0</div>
+          <div class="tile-label">Day Hours</div>
+        </div>
+
+        <div class="tile tile--night-hours">
+          <div class="tile-glow"></div>
+          <div class="tile-value" id="nightHoursVal">0</div>
+          <div class="tile-label">Night Hours</div>
+        </div>
+
+        <div class="tile tile--minutes">
+          <div class="tile-glow"></div>
+          <div class="tile-value" id="minsVal">0</div>
+          <div class="tile-label">Minutes Left Today</div>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="progress-wrap">
+        <div class="progress-labels">
+          <span id="progressStart">–</span>
+          <span class="progress-pct" id="progressPct">0%</span>
+          <span id="progressEnd">–</span>
+        </div>
+        <div class="progress-track" style="border-color: rgba(255,255,255,0.05)">
+          <div class="progress-fill" id="progressFill" style="background:var(--active-color)"></div>
+        </div>
+      </div>
+
+      <!-- Exact deadline -->
+      <div class="deadline-exact" id="deadlineExact">–</div>
+
+      <!-- Timeline -->
+      <div class="timeline-section" id="timelineSection">
+        <div class="timeline-header">
+          <h2 class="timeline-title">Timeline</h2>
+          <div class="view-toggles">
+            <button class="view-btn active" id="btnListView">List</button>
+            <button class="view-btn" id="btnWaterfallView">Waterfall</button>
+          </div>
+          <button class="btn-add-milestone" id="btnAddMilestone">+ Add</button>
+        </div>
+        
+        <!-- List View -->
+        <div class="timeline-wrap" id="timelineWrap">
+          <div class="timeline-empty" id="timelineEmpty">No milestones yet. Add one above to map your journey.</div>
+        </div>
+
+        <!-- Waterfall View -->
+        <div class="waterfall-wrap hidden" id="waterfallWrap">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Expired message ──────────────────────────────────────── -->
+    <section class="expired-panel hidden" id="expiredPanel">
+      <div class="expired-emoji"></div>
+      <h2 class="expired-title" id="expiredTitle">Deadline Reached!</h2>
+      <p class="expired-sub" id="expiredLabel">–</p>
+      <button class="btn-reset" id="btnExpiredBack">Back to Hub</button>
+    </section>
+
+  </main>
+
+  <!-- ── Create / Edit Deadline Modal ──────────────────────────── -->
+  <div class="modal-overlay hidden" id="deadlineModal">
+    <div class="modal-card">
+      <button class="modal-close" id="btnCloseDeadlineModal" aria-label="Close">✕</button>
+      <h3 class="modal-title" id="deadlineModalTitle">New Deadline</h3>
+      <div class="setup-form">
+        <div class="field-group">
+          <label for="dlName">Deadline Name</label>
+          <input type="text" id="dlName" placeholder="e.g. Project Launch" maxlength="40" />
+        </div>
+        <div class="field-group">
+          <label for="dlDate">Target Date &amp; Time</label>
+          <input type="datetime-local" id="dlDate" />
+        </div>
+        <div class="field-group">
+          <label for="dlDayStart">Daytime Starts</label>
+          <input type="time" id="dlDayStart" value="07:00" />
+        </div>
+        <div class="field-group">
+          <label for="dlDayEnd">Daytime Ends</label>
+          <input type="time" id="dlDayEnd" value="22:00" />
+        </div>
+        <div class="field-group">
+          <label>Theme Colour</label>
+          <div class="color-row" id="dlColorRow">
+            <button class="color-swatch selected" data-color="#00d4b4" style="background:#00d4b4" aria-label="Teal"></button>
+            <button class="color-swatch" data-color="#f5a623" style="background:#f5a623" aria-label="Amber"></button>
+            <button class="color-swatch" data-color="#6c63ff" style="background:#6c63ff" aria-label="Violet"></button>
+            <button class="color-swatch" data-color="#ff5f84" style="background:#ff5f84" aria-label="Pink"></button>
+            <button class="color-swatch" data-color="#38d9a9" style="background:#38d9a9" aria-label="Mint"></button>
+            <button class="color-swatch" data-color="#74c0fc" style="background:#74c0fc" aria-label="Sky"></button>
+            <button class="color-swatch" data-color="#ff922b" style="background:#ff922b" aria-label="Orange"></button>
+            <button class="color-swatch" data-color="#eebefa" style="background:#eebefa" aria-label="Lavender"></button>
+          </div>
+        </div>
+        <button class="btn-start" id="btnSaveDeadline">Save Deadline</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Milestone Modal ────────────────────────────────────────── -->
+  <div class="modal-overlay hidden" id="milestoneModal">
+    <div class="modal-card" id="milestoneModalCard">
+      <button class="modal-close" id="btnModalClose" aria-label="Close">✕</button>
+      <h3 class="modal-title">Add Milestone</h3>
+      <div class="setup-form">
+        <div class="field-group">
+          <label for="msName">Milestone Name</label>
+          <input type="text" id="msName" placeholder="e.g. First Draft Done" maxlength="50" />
+        </div>
+        <div class="field-group">
+          <label for="msDate">Date &amp; Time</label>
+          <input type="datetime-local" id="msDate" />
+        </div>
+        <div class="field-group">
+          <label for="msLocation">Location / URL (Optional)</label>
+          <input type="text" id="msLocation" placeholder="e.g. 📍 Rome, or a zoom link" maxlength="300" />
+        </div>
+        <div class="field-group">
+          <label>Colour</label>
+          <div class="color-row" id="colorRow">
+            <button class="color-swatch selected" data-color="#00d4b4" style="background:#00d4b4"></button>
+            <button class="color-swatch" data-color="#f5a623" style="background:#f5a623"></button>
+            <button class="color-swatch" data-color="#6c63ff" style="background:#6c63ff"></button>
+            <button class="color-swatch" data-color="#ff5f84" style="background:#ff5f84"></button>
+            <button class="color-swatch" data-color="#38d9a9" style="background:#38d9a9"></button>
+            <button class="color-swatch" data-color="#74c0fc" style="background:#74c0fc"></button>
+          </div>
+        </div>
+        <button class="btn-start" id="btnSaveMilestone">Add to Timeline</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SW Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
+      });
+    }
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>

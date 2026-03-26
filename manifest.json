@@ -1,0 +1,16 @@
+{
+  "name": "CountDown Timer",
+  "short_name": "CountDown",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#090b1a",
+  "theme_color": "#090b1a",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512 any",
+      "purpose": "any maskable"
+    }
+  ]
+}
