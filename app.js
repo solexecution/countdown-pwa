@@ -248,8 +248,12 @@ function renderHub() {
     hubEmpty.classList.remove('hidden');
   } else {
     hubEmpty.classList.add('hidden');
-    // Sort array: closest deadline first
-    const sorted = [...state.deadlines].sort((a,b) => new Date(a.deadline) - new Date(b.deadline));
+    // Sort array: closest deadline first, but Risko Day is explicitly pinned to index 0
+    const sorted = [...state.deadlines].sort((a,b) => {
+      if (a.name === 'Risko Day') return -1;
+      if (b.name === 'Risko Day') return 1;
+      return new Date(a.deadline) - new Date(b.deadline);
+    });
 
     sorted.forEach(dl => {
       const msDt = new Date(dl.deadline);
@@ -290,7 +294,7 @@ function renderHub() {
         <div class="dl-card-next ${!nextMs || past ? 'empty' : ''}">
           ${nextMs ? `${esc(nextMs.name)} ${relativeDelta(new Date(nextMs.date), now)}` : ''}
         </div>
-        ${dl.id === 'risko_day' ? '' : `<button class="dl-card-del" data-id="${dl.id}" title="Delete deadline">✕</button>`}
+        ${dl.name === 'Risko Day' ? '' : `<button class="dl-card-del" data-id="${dl.id}" title="Delete deadline">✕</button>`}
       `;
 
       // Navigate to countdown
@@ -796,7 +800,7 @@ function loadState() {
 }
 
 function ensureRiskoDay() {
-  const exists = state.deadlines.some(d => d.id === 'risko_day');
+  const exists = state.deadlines.some(d => d.name === 'Risko Day');
   if (!exists) {
     state.deadlines.unshift({
       id: 'risko_day',
